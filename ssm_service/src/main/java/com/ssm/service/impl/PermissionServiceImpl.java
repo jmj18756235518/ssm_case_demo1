@@ -1,4 +1,4 @@
-package com.ssm.service.impl;
+﻿package com.ssm.service.impl;
 
 import com.ssm.dao.PermissionDao;
 import com.ssm.domain.Permission;
@@ -11,6 +11,7 @@ import java.util.List;
 @Service
 public class PermissionServiceImpl implements PermissionService {
 
+//
     @Autowired
     private PermissionDao permissionDao;
 

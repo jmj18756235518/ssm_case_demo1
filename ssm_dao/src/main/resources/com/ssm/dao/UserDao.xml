@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.UserDao">
+    <resultMap id="userMap" type="usersinfo">
+        <id property="userId" column="id"  />
+        <result property="email" column="email"  />
+        <result property="username" column="username" />
+        <result property="password" column="password" />
+        <result property="phoneNum" column="phonenum" />
+        <result property="status" column="status" />
+
+        <!--
+            一个用户对应多个角色
+            通过关联表查询：   使用子查询去查询角色   角色表中的id就是id
+        -->
+        <collection property="roleList" column="id" ofType="role"
+                    select="com.ssm.dao.RoleDao.findRoleByUserId" fetchType="lazy" />
+    </resultMap>
+
+    <!--登录模块-->
+    <select id="findLogin" parameterType="string" resultMap="userMap">
+        SELECT * FROM USERS WHERE USERNAME = #{username}
+    </select>
+
+    <!--查询所有的用户-->
+    <select id="findAll" resultMap="userMap">
+        SELECT * FROM USERS
+    </select>
+
+    <!-- 添加用户 -->
+    <update id="addUsersInfo" parameterType="usersInfo">
+        INSERT INTO USERS(EMAIL,USERNAME,PASSWORD,PHONENUM,STATUS)
+          VALUES (#{email},#{username},#{password},#{phoneNum},#{status})
+    </update>
+
+    <!--查询用户详情-->
+    <select id="findUsersInfoById" parameterType="string" resultMap="userMap">
+        SELECT * FROM USERS WHERE ID = #{userId}
+    </select>
+
+    <!--根据id去修改用户-->
+    <update id="updateUser" parameterType="usersInfo">
+        UPDATE USERS SET EMAIL= #{email},USERNAME=#{username},
+            password=#{password},phonenum=#{phoneNum},status=#{status} WHERE id=#{userId}
+    </update>
+
+    <!-- 根据id删除user -->
+    <update id="delUserById" parameterType="string">
+        DELETE FROM users WHERE id = #{userId}
+    </update>
+
+    <!-- 根据id删除关联表中的记录 -->
+    <update id="delRoleByUserId" parameterType="string" >
+        DELETE FROM USERS_ROLE WHERE USERID = #{userId}
+    </update>
+
+    <!-- 根据userID
+    删除权限的关联记录 -->
+    <update id="delPermissionByUserId" parameterType="string">
+        DELETE FROM ROLE_PERMISSION WHERE ROLEID =
+          (SELECT ROLEID FROM USERS_ROLE WHERE USERID = #{userId})
+    </update>
+
+    <update id="addRoleToUser" parameterType="string">
+        INSERT INTO USERS_ROLE(USERID,ROLEID) values(#{userId},#{roleId})
+    </update>
+
+</mapper>

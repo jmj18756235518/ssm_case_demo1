@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.dao.TravellerDao">
+    <resultMap id="travellerMap" type="traveller">
+        <id property="travellerId" column="id" />
+        <result property="travellerName" column="name" />
+        <result property="sex" column="sex" />
+        <result property="phoneNum" column="phonenum" />
+        <result property="credentialsType" column="credentialstype" />
+        <result property="credentialsNum" column="credentialsnum" />
+        <result property="travellerType" column="travellertype" />
+    </resultMap>
+
+    <!--根据订单的id，通过关联表进行子查询，首先查询到关联表中与订单编号对应的所有的游客id，再通过in查询-->
+    <select id="findTravellerByOrderId" resultMap="travellerMap" parameterType="string">
+        SELECT * FROM TRAVELLER WHERE ID IN (SELECT TRAVELLERID FROM ORDER_TRAVELLER
+         WHERE ORDERID = #{orderId})
+    </select>
+
+</mapper>

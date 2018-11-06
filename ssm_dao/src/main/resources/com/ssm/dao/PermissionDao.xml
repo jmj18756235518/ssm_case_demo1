@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.PermissionDao">
+
+    <!-- 权限 -->
+    <resultMap id="permissionMap" type="permission">
+        <id property="permissionId" column="id" />
+        <result property="permissionName" column="permissionname" />
+        <result property="url" column="url" />
+
+    </resultMap>
+
+    <!--通过roleId去关联表找到所有对应的权限的id，再使用in去查询到所有的权限-->
+    <select id="findPermissionByRoleId" resultMap="permissionMap" parameterType="string">
+        SELECT * FROM PERMISSION WHERE ID IN
+          (SELECT PERMISSIONID FROM ROLE_PERMISSION WHERE ROLEID = #{roleId})
+    </select>
+
+    <!--查询所有的权限-->
+    <select id="findAll" resultMap="permissionMap">
+        SELECT * FROM PERMISSION
+    </select>
+
+    <!-- 添加一个资源权限 -->
+    <update id="addPermission" parameterType="permission" >
+        INSERT INTO PERMISSION(PERMISSIONNAME,URL) VALUEs(#{permissionName},#{url})
+    </update>
+</mapper>

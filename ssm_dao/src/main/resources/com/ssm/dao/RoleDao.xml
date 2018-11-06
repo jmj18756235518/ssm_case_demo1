@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.dao.RoleDao">
+
+    <!-- 角色 -->
+    <resultMap id="roleMap" type="role">
+        <id property="roleId" column="id" />
+        <result property="roleName" column="rolename" />
+        <result property="roleDesc" column="roledesc" />
+
+        <!--  一个角色下面也有多个权限  -->
+        <collection property="permissionList" column="id" ofType="permission"
+                    select="com.ssm.dao.PermissionDao.findPermissionByRoleId" fetchType="lazy" />
+    </resultMap>
+
+    <!--根据用户的id去查询用户下面的所有的角色-->
+    <select id="findRoleByUserId"  resultMap="roleMap" parameterType="string">
+        SELECT * FROM ROLE WHERE ID IN
+          (SELECT ROLEID FROM USERS_ROLE WHERE USERID = #{userID})
+    </select>
+
+    <!--查询所有的角色-->
+    <select id="findAll" resultMap="roleMap">
+        SELECT  * FROM role
+    </select>
+
+    <!--添加角色-->
+    <update id="addRole" parameterType="string" >
+        INSERT INTO ROLE(ROLENAME,ROLEDESC) VALUES (#{roleName},#{roleDesc})
+    </update>
+
+    <!-- 根据id查询角色，角色详情 -->
+    <select id="findRoleById" parameterType="string" resultMap="roleMap">
+        SELECT * FROM ROLE WHERE id = #{id}
+    </select>
+
+    <!--根据角色的id去修改此角色-->
+    <update id="updateRoleById" parameterType="role" >
+        UPDATE ROLE SET ROLENAME = #{roleName},roledesc = #{roleDesc} WHERE id = #{roleId}
+    </update>
+
+    <!--根据角色的id去删除角色权限关联表中所有的roleId对应的所有记录-->
+    <update id="dePermissionByRoleId" parameterType="string">
+        DELETE FROM ROLE_PERMISSION WHERE ROLEID = #{roleId}
+    </update>
+
+    <!--给角色添加权限，与权限进行关联-->
+    <update id="addPermissionToRole" parameterType="string">
+        INSERT INTO ROLE_PERMISSION(ROLEID,PERMISSIONID) VALUES (#{roleId},#{permissionId})
+    </update>
+
+</mapper>
+
+
+
+

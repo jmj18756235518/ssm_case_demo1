@@ -21,8 +21,8 @@ public interface PermissionService {
 
 
     /**
-     * 添加权限
-     *
+     * 添加权限.
+     * ...
      * 添加权限操作
      * @param permission
      */

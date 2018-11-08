@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.dao.OrdersDao">
+
+    <resultMap id="orderMap" type="orders">
+        <id  property="orderId" column="id" />
+        <result property="orderNum" column="ordernum"  />
+        <result property="orderTime" column="ordertime"  />
+        <result property="peopleCount" column="peoplecount"  />
+        <result property="orderDesc" column="orderdesc" />
+        <result property="payType" column="paytype" />
+        <result property="orderStatus" column="orderstatus"  />
+        <result property="productId" column="productid"  />
+        <result property="memberId" column="memberid"  />
+        <!-- 查询到订单下对应的商品 一个订单对应一个商品  将productId传递给productDao -->
+        <association property="product" column="productId" javaType="orders"
+                    select="com.ssm.dao.ProductDao.findProductById" fetchType="lazy" ></association>
+
+        <!--查询订单下面的会员，一个订单对应一个会员-->
+        <association property="member" column="memberId" javaType="member"
+                    select="com.ssm.dao.MemberDao.findMemberById" fetchType="lazy"></association>
+
+        <!--
+            查询订单下面的游客，一个订单对应多个游客    使用子查询
+            通过订单的id去关联表查询到对应的游客的id，再通过游客的id去查询到所有的游客
+        -->
+        <collection property="travellerList" ofType="traveller" column="id"
+                select="com.ssm.dao.TravellerDao.findTravellerByOrderId" fetchType="lazy"></collection>
+
+    </resultMap>
+
+    <!--  查询所有的订单  -->
+    <select id="findAll" resultMap="orderMap" parameterType="orders">
+        SELECT * FROM ORDERS
+        <where>
+            <if test="orderNum != null">
+                AND ordernum LIKE #{orderNum}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据订单的id查询订单 -->
+    <select id="findOrderById" resultMap="orderMap" parameterType="String">
+        SELECT * FROM ORDERS WHERE ID = #{orderId}
+    </select>
+
+
+    <!-- 根据订单id去跟新订单 -->
+    <update id="updateOrderById" parameterType="orders" >
+        UPDATE ORDERS SET ORDERTIME=#{orderTime} ,ORDERSTATUS=#{orderStatus},
+        ORDERDESC=#{orderDesc},PEOPLECOUNT=#{peopleCount} WHERE ID=#{orderId}
+    </update>
+
+</mapper>

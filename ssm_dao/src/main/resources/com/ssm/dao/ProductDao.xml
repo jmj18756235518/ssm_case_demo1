@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssm.dao.ProductDao">
+
+    <!--  将实体类中的属性名与数据库中的属性名一一对应  -->
+    <resultMap id="productMap" type="product">
+        <id property="productId" column="id" />
+        <result property="productNum" column="productnum" />
+        <result property="productName" column="productname" />
+        <result property="cityName" column="cityname" />
+        <result property="departureTime" column="departuretime" />
+        <result property="productPrice" column="productprice" />
+        <result property="productDesc" column="productdesc" />
+        <result property="productStatus" column="productstatus" />
+    </resultMap>
+
+    <!-- 查询所有 -->
+    <select id="findAll" resultMap="productMap">
+        SELECT * FROM PRODUCT
+    </select>
+
+    <!-- 保存商品 -->
+    <update id="saveProduct" parameterType="product">
+        insert into PRODUCT ( productnum, productname, cityname, departuretime, productprice,
+        productdesc, productstatus)
+        values(#{productNum},#{productName},#{cityName},#{departureTime},#{productPrice},
+        #{productDesc},#{productStatus})
+    </update>
+
+    <!--根据Id删除记录-->
+    <select id="delProductById" parameterType="String" resultType="product">
+        DELETE FROM PRODUCT WHERE ID = #{id}
+    </select>
+
+    <!--根据id去查询product表，返回一个product对象，实现页面回显功能-->
+    <select id="findProductById" parameterType="String" resultMap="productMap">
+        SELECT * FROM PRODUCT WHERE ID = #{id}
+    </select>
+
+    <!--更新产品-->
+    <update id="updateProductById" parameterType="product">
+        UPDATE PRODUCT SET productnum = #{productNum},productname=#{productName},cityname=#{cityName},departuretime=#{departureTime},
+        productprice=#{productPrice},productdesc=#{productDesc},productstatus=#{productStatus} WHERE id=#{productId}
+    </update>
+
+</mapper>
